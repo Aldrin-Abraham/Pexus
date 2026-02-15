@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - {{ user.name if user else 'User' }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Welcome Section -->
+    <div style="margin-bottom: 40px;">
+        <h1 style="margin-bottom: 10px;">Welcome, {{ user.name if user else 'User' }}!</h1>
+        <p style="color: var(--text-light); font-size: 1.1rem;">
+            <i class="fas fa-clock"></i> {{ now.strftime('%A, %B %d, %Y') if now else '' }}
+        </p>
+    </div>
+    
+    <!-- Balance Card -->
+    <div class="balance-card">
+        <div class="balance-label">AVAILABLE BALANCE</div>
+        <div class="balance-amount">{{ format_currency(balance) if balance is not none else '₹0.00' }}</div>
+        <div class="balance-footer">
+            <i class="fas fa-wallet"></i> Wallet ID: {{ wallet.wallet_id if wallet and wallet.wallet_id else 'N/A' }}
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <h3 style="margin-bottom: 20px;"><i class="fas fa-bolt"></i> Quick Actions</h3>
+    <div class="dashboard-cards">
+        <a href="{{ url_for('make_payment') }}" class="dashboard-card">
+            <div style="font-size: 40px; margin-bottom: 15px; color: var(--accent-blue);">
+                <i class="fas fa-paper-plane"></i>
+            </div>
+            <h3>Send Payment</h3>
+            <p>Transfer money to merchants or users instantly</p>
+            <span class="btn btn-sm" style="margin-top: 15px;">Pay Now →</span>
+        </a>
+        
+        <a href="{{ url_for('transaction_history') }}" class="dashboard-card">
+            <div style="font-size: 40px; margin-bottom: 15px; color: var(--accent-blue);">
+                <i class="fas fa-history"></i>
+            </div>
+            <h3>Transaction History</h3>
+            <p>View all your payment activity</p>
+            <span class="btn btn-sm" style="margin-top: 15px;">View →</span>
+        </a>
+        
+        <a href="{{ url_for('refund') }}" class="dashboard-card">
+            <div style="font-size: 40px; margin-bottom: 15px; color: var(--accent-blue);">
+                <i class="fas fa-undo-alt"></i>
+            </div>
+            <h3>Request Refund</h3>
+            <p>Process refunds for completed transactions</p>
+            <span class="btn btn-sm" style="margin-top: 15px;">Refund →</span>
+        </a>
+        
+        <a href="{{ url_for('summary') }}" class="dashboard-card">
+            <div style="font-size: 40px; margin-bottom: 15px; color: var(--accent-blue);">
+                <i class="fas fa-chart-pie"></i>
+            </div>
+            <h3>Summary</h3>
+            <p>View payment analytics and breakdown</p>
+            <span class="btn btn-sm" style="margin-top: 15px;">Analyze →</span>
+        </a>
+    </div>
+    
+    <!-- Recent Transactions -->
+    <div style="margin-top: 50px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3><i class="fas fa-clock"></i> Recent Transactions</h3>
+            <a href="{{ url_for('transaction_history') }}" class="btn btn-sm btn-outline">
+                View All <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+        
+        {% if transactions and transactions|length > 0 %}
+        <div class="data-table-container">
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Transaction ID</th>
+                            <th>Date & Time</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for t in transactions %}
+                        {% if t %}
+                        <tr>
+                            <td>
+                                <span style="font-family: monospace;">{{ t.transaction_id[-12:] if t.transaction_id else 'N/A' }}</span>
+                            </td>
+                            <td>{{ t.timestamp.strftime('%d %b %Y, %I:%M %p') if t.timestamp else 'N/A' }}</td>
+                            <td>
+                                {% if t.sender_id == session.user_id %}
+                                    <span style="color: var(--danger-red);">To: {{ t.receiver_id if t.receiver_id else 'N/A' }}</span>
+                                {% else %}
+                                    <span style="color: var(--success-green);">From: {{ t.sender_id if t.sender_id else 'N/A' }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="amount">{{ format_currency(t.amount) if t.amount else 'N/A' }}</td>
+                            <td>
+                                {% if t.status == 'success' and not t.refunded %}
+                                    <span class="status-badge status-success">
+                                        <i class="fas fa-check-circle"></i> Success
+                                    </span>
+                                {% elif t.status == 'pending' %}
+                                    <span class="status-badge status-pending">
+                                        <i class="fas fa-clock"></i> Pending
+                                    </span>
+                                {% elif t.status == 'failed' %}
+                                    <span class="status-badge status-failed">
+                                        <i class="fas fa-times-circle"></i> Failed
+                                    </span>
+                                {% elif t.refunded %}
+                                    <span class="status-badge status-refunded">
+                                        <i class="fas fa-undo-alt"></i> Refunded
+                                    </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 60px 20px; background: white; border-radius: var(--radius); box-shadow: var(--shadow);">
+            <div style="font-size: 60px; color: var(--slate); margin-bottom: 20px;">
+                <i class="fas fa-receipt"></i>
+            </div>
+            <h3 style="margin-bottom: 10px;">No Transactions Yet</h3>
+            <p style="color: var(--text-light); margin-bottom: 20px;">Make your first payment to get started</p>
+            <a href="{{ url_for('make_payment') }}" class="btn">
+                <i class="fas fa-paper-plane"></i> Send Payment
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Add current date
+    document.addEventListener('DOMContentLoaded', function() {
+        const now = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        const dateElement = document.querySelector('h1 + p');
+        if (dateElement) {
+            dateElement.innerHTML = '<i class="fas fa-clock"></i> ' + now.toLocaleDateString('en-US', options);
+        }
+    });
+</script>
+{% endblock %}

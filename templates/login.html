@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Pexus Payment Gateway{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div style="max-width: 500px; margin: 0 auto;">
+        <div class="form-container" style="margin-top: 50px;">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <div class="logo-icon" style="margin: 0 auto 20px; width: 70px; height: 70px; font-size: 30px;">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <h2 style="margin-bottom: 10px;">Welcome Back</h2>
+                <p style="color: var(--text-light);">Login to your Pexus account</p>
+            </div>
+            
+            <form method="POST">
+                <div class="form-group">
+                    <label for="user_id"><i class="fas fa-user"></i> User ID</label>
+                    <input type="text" id="user_id" name="user_id" placeholder="Enter your user ID" required>
+                    <small>Try: alice, bob, carol, merchant_amazon, admin</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password"><i class="fas fa-lock"></i> Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter password" value="demo">
+                    <small>Demo mode - any password works</small>
+                </div>
+                
+                <button type="submit" class="btn btn-block" style="margin-bottom: 20px;">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+            </form>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <p style="color: var(--text-light); font-size: 0.9rem;">
+                    <i class="fas fa-info-circle"></i> Demo Accounts:
+                </p>
+                <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 15px;">
+                    <span class="status-badge" style="background: var(--light-blue); color: var(--primary-deepblue);">alice</span>
+                    <span class="status-badge" style="background: var(--light-blue); color: var(--primary-deepblue);">bob</span>
+                    <span class="status-badge" style="background: var(--light-blue); color: var(--primary-deepblue);">carol</span>
+                    <span class="status-badge" style="background: var(--light-blue); color: var(--primary-deepblue);">david</span>
+                    <span class="status-badge" style="background: var(--light-blue); color: var(--primary-deepblue);">eve</span>
+                    <span class="status-badge" style="background: #e3f2fd; color: #0d47a1;">merchant_amazon</span>
+                    <span class="status-badge" style="background: #e3f2fd; color: #0d47a1;">merchant_flipkart</span>
+                    <span class="status-badge" style="background: #ffeb3b; color: #333;">admin</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

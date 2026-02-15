@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+
+{% block title %}Modern Digital Payment Gateway{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container hero-content">
+        <div class="logo-icon" style="margin: 0 auto 20px; width: 80px; height: 80px; font-size: 40px;">
+            <i class="fas fa-bolt"></i>
+        </div>
+        <h1>Pexus Payment Gateway</h1>
+        <p style="font-size: 1.3rem; margin-bottom: 20px;">The future of digital payments is here</p>
+        <p style="max-width: 700px; margin: 0 auto 40px;">Experience seamless, secure, and lightning-fast transactions powered by OOP architecture and Neon PostgreSQL.</p>
+        
+        {% if not session.get('user_id') %}
+            <div class="d-flex justify-content-center">
+                <a href="{{ url_for('login') }}" class="btn btn-lg">
+                    <i class="fas fa-sign-in-alt"></i> Get Started
+                </a>
+            </div>
+        {% else %}
+            <a href="{{ url_for('dashboard') }}" class="btn btn-lg">
+                <i class="fas fa-tachometer-alt"></i> Go to Dashboard
+            </a>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="stats-section" style="padding: 60px 0;">
+    <div class="container">
+        <h2 style="text-align: center; margin-bottom: 20px;">Gateway Performance</h2>
+        <p style="text-align: center; color: var(--text-light); margin-bottom: 50px;">Real-time metrics from our payment processing engine</p>
+        
+        <div class="stats-grid grid grid-4">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-exchange-alt"></i>
+                </div>
+                <div class="stat-number">{{ stats.total_transactions }}</div>
+                <div class="stat-label">Total Transactions</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-number">{{ stats.successful_payments }}</div>
+                <div class="stat-label">Successful Payments</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-number">{{ stats.active_users }}</div>
+                <div class="stat-label">Active Users</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-indian-rupee-sign"></i>
+                </div>
+                <div class="stat-number">{{ format_currency(stats.total_volume) }}</div>
+                <div class="stat-label">Total Volume</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- OOP Concepts Section -->
+<section class="oop-section" style="padding: 60px 0; background: linear-gradient(135deg, #ffffff, var(--slate-light));">
+    <div class="container">
+        <h2 style="text-align: center; margin-bottom: 20px;">Object-Oriented Architecture</h2>
+        <p style="text-align: center; color: var(--text-light); margin-bottom: 50px;">Built with SOLID principles and enterprise design patterns</p>
+        
+        <div class="oop-cards grid grid-5">
+            <div class="oop-card">
+                <div style="font-size: 40px; margin-bottom: 15px; color: var(--primary-deepblue);">
+                    <i class="fas fa-cubes"></i>
+                </div>
+                <h4 style="color: var(--primary-deepblue);">Abstraction</h4>
+                <p style="color: var(--text-light); font-size: 0.9rem;">PaymentMethod abstract class defines clear contract for all payment types</p>
+            </div>
+            
+            <div class="oop-card">
+                <div style="font-size: 40px; margin-bottom: 15px; color: var(--primary-deepblue);">
+                    <i class="fas fa-code-branch"></i>
+                </div>
+                <h4 style="color: var(--primary-deepblue);">Inheritance</h4>
+                <p style="color: var(--text-light); font-size: 0.9rem;">WalletPayment, CardPayment, UPIPayment inherit from base PaymentMethod</p>
+            </div>
+            
+            <div class="oop-card">
+                <div style="font-size: 40px; margin-bottom: 15px; color: var(--primary-deepblue);">
+                    <i class="fas fa-shapes"></i>
+                </div>
+                <h4 style="color: var(--primary-deepblue);">Polymorphism</h4>
+                <p style="color: var(--text-light); font-size: 0.9rem;">Gateway processes any payment method through common interface</p>
+            </div>
+            
+            <div class="oop-card">
+                <div style="font-size: 40px; margin-bottom: 15px; color: var(--primary-deepblue);">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h4 style="color: var(--primary-deepblue);">Encapsulation</h4>
+                <p style="color: var(--text-light); font-size: 0.9rem;">Internal states protected, exposed via controlled methods</p>
+            </div>
+            
+            <div class="oop-card">
+                <div style="font-size: 40px; margin-bottom: 15px; color: var(--primary-deepblue);">
+                    <i class="fas fa-layer-group"></i>
+                </div>
+                <h4 style="color: var(--primary-deepblue);">Singleton</h4>
+                <p style="color: var(--text-light); font-size: 0.9rem;">Single PaymentGateway instance manages all operations</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Payment Methods Section -->
+<section style="padding: 60px 0;">
+    <div class="container">
+        <h2 style="text-align: center; margin-bottom: 20px;">Supported Payment Methods</h2>
+        <p style="text-align: center; color: var(--text-light); margin-bottom: 50px;">Multiple payment options with built-in validation</p>
+        
+        <div class="payment-methods-grid">
+            <div class="payment-method-card">
+                <div class="payment-method-icon">
+                    <i class="fas fa-wallet"></i>
+                </div>
+                <h3 class="payment-method-name">Wallet</h3>
+                <p class="payment-method-desc">Instant transfers, zero fees</p>
+            </div>
+            
+            <div class="payment-method-card">
+                <div class="payment-method-icon">
+                    <i class="fas fa-credit-card"></i>
+                </div>
+                <h3 class="payment-method-name">Card</h3>
+                <p class="payment-method-desc">Credit & Debit cards</p>
+            </div>
+            
+            <div class="payment-method-card">
+                <div class="payment-method-icon">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <h3 class="payment-method-name">UPI</h3>
+                <p class="payment-method-desc">Google Pay, PhonePe, Paytm</p>
+            </div>
+            
+            <div class="payment-method-card">
+                <div class="payment-method-icon">
+                    <i class="fas fa-university"></i>
+                </div>
+                <h3 class="payment-method-name">Net Banking</h3>
+                <p class="payment-method-desc">All major banks</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Technology Stack -->
+<section style="padding: 60px 0; background: white;">
+    <div class="container">
+        <h2 style="text-align: center; margin-bottom: 20px;">Technology Stack</h2>
+        <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 30px;">
+            <div style="text-align: center;">
+                <div style="font-size: 40px; color: var(--primary-deepblue);"><i class="fas fa-flask"></i></div>
+                <p style="font-weight: 600;">Flask</p>
+            </div>
+            <div style="text-align: center;">
+                <div style="font-size: 40px; color: var(--primary-deepblue);"><i class="fas fa-database"></i></div>
+                <p style="font-weight: 600;">Neon PostgreSQL</p>
+            </div>
+            <div style="text-align: center;">
+                <div style="font-size: 40px; color: var(--primary-deepblue);"><i class="fas fa-code"></i></div>
+                <p style="font-weight: 600;">Python 3.11</p>
+            </div>
+            <div style="text-align: center;">
+                <div style="font-size: 40px; color: var(--primary-deepblue);"><i class="fas fa-cloud"></i></div>
+                <p style="font-weight: 600;">Vercel</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Test Users Section -->
+<section style="padding: 60px 0; background: var(--cream-bg);">
+    <div class="container">
+        <h2 style="text-align: center; margin-bottom: 20px;">Demo Credentials</h2>
+        <p style="text-align: center; color: var(--text-light); margin-bottom: 40px;">Try the gateway with these test accounts</p>
+        
+        <div class="grid grid-3" style="gap: 20px;">
+            <div class="card">
+                <h4><i class="fas fa-user"></i> Customer Accounts</h4>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="padding: 10px 0; border-bottom: 1px solid var(--slate-light);">
+                        <strong>alice</strong> - ₹50,000
+                    </li>
+                    <li style="padding: 10px 0; border-bottom: 1px solid var(--slate-light);">
+                        <strong>bob</strong> - ₹35,000
+                    </li>
+                    <li style="padding: 10px 0; border-bottom: 1px solid var(--slate-light);">
+                        <strong>carol</strong> - ₹25,000
+                    </li>
+                    <li style="padding: 10px 0;">
+                        <strong>eve</strong> - ₹15,000
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <h4><i class="fas fa-store"></i> Merchant Accounts</h4>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="padding: 10px 0; border-bottom: 1px solid var(--slate-light);">
+                        <strong>merchant_amazon</strong> - ₹10,00,000
+                    </li>
+                    <li style="padding: 10px 0; border-bottom: 1px solid var(--slate-light);">
+                        <strong>merchant_flipkart</strong> - ₹8,00,000
+                    </li>
+                    <li style="padding: 10px 0; border-bottom: 1px solid var(--slate-light);">
+                        <strong>merchant_swiggy</strong> - ₹5,00,000
+                    </li>
+                    <li style="padding: 10px 0;">
+                        <strong>merchant_zomato</strong> - ₹6,00,000
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <h4><i class="fas fa-user-shield"></i> Admin Account</h4>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="padding: 10px 0;">
+                        <strong>admin</strong> - System Administrator
+                    </li>
+                </ul>
+                <p style="margin-top: 20px; color: var(--text-light); font-size: 0.9rem;">
+                    <i class="fas fa-info-circle"></i> Login with any username to test
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Request Refund - Pexus{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div style="max-width: 700px; margin: 0 auto;">
+        <div style="text-align: center; margin-bottom: 40px;">
+            <div style="font-size: 60px; color: var(--warning-orange); margin-bottom: 20px;">
+                <i class="fas fa-undo-alt"></i>
+            </div>
+            <h1 style="margin-bottom: 10px;">Request Refund</h1>
+            <p style="color: var(--text-light);">Process refunds for completed transactions</p>
+        </div>
+        
+        {% if transactions %}
+        <div class="form-container">
+            <form method="POST">
+                <div class="form-group">
+                    <label for="transaction_id"><i class="fas fa-exchange-alt"></i> Select Transaction</label>
+                    <select id="transaction_id" name="transaction_id" required>
+                        <option value="">Choose a transaction to refund</option>
+                        {% for t in transactions %}
+                        <option value="{{ t.transaction_id }}">
+                            {{ t.transaction_id[-12:] }} - ₹{{ t.amount }} - {{ t.receiver_id }} ({{ t.timestamp.strftime('%d %b %Y') }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="reason"><i class="fas fa-align-left"></i> Reason for Refund</label>
+                    <textarea id="reason" name="reason" rows="3" placeholder="Please provide a reason for refund">Customer requested refund</textarea>
+                </div>
+                
+                <div style="background: #fff3cd; border-left: 5px solid var(--warning-orange); padding: 20px; border-radius: var(--radius-sm); margin-bottom: 30px;">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div style="font-size: 24px; color: var(--warning-orange);">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <div>
+                            <strong style="color: #856404;">Important:</strong>
+                            <p style="color: #856404; margin: 5px 0 0; font-size: 0.9rem;">
+                                Refunds are processed instantly and cannot be reversed. The full amount will be returned to the sender's wallet.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-warning btn-block">
+                    <i class="fas fa-undo-alt"></i> Process Refund
+                </button>
+            </form>
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 60px 20px; background: white; border-radius: var(--radius); box-shadow: var(--shadow);">
+            <div style="font-size: 70px; color: var(--slate); margin-bottom: 20px;">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2 style="margin-bottom: 15px;">No Refundable Transactions</h2>
+            <p style="color: var(--text-light); margin-bottom: 20px;">
+                You don't have any successful transactions that are eligible for refund.
+            </p>
+            <a href="{{ url_for('make_payment') }}" class="btn">
+                <i class="fas fa-paper-plane"></i> Make a Payment
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

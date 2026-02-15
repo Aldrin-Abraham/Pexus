@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+
+{% block title %}Make Payment - Pexus{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div style="max-width: 800px; margin: 0 auto;">
+        <div style="text-align: center; margin-bottom: 40px;">
+            <h1><i class="fas fa-paper-plane"></i> Send Payment</h1>
+            <p style="color: var(--text-light);">Transfer money securely with your preferred payment method</p>
+        </div>
+        
+        <div class="form-container">
+            <form method="POST" id="paymentForm">
+                <!-- Payment Details -->
+                <div style="margin-bottom: 30px;">
+                    <h3 style="margin-bottom: 20px;">Payment Details</h3>
+                    
+                    <div class="form-group">
+                        <label for="receiver_id"><i class="fas fa-user"></i> Recipient</label>
+                        <select id="receiver_id" name="receiver_id" required>
+                            <option value="">Select recipient</option>
+                            {% for receiver in receivers %}
+                            <option value="{{ receiver }}">{{ receiver }} ({{ DEFAULT_USERS[receiver].name if DEFAULT_USERS else receiver }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="amount"><i class="fas fa-indian-rupee-sign"></i> Amount</label>
+                        <input type="number" id="amount" name="amount" min="1" step="0.01" placeholder="Enter amount" required>
+                        <small>Available balance: {{ format_currency(user_wallet.balance) }}</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description"><i class="fas fa-align-left"></i> Description (Optional)</label>
+                        <input type="text" id="description" name="description" placeholder="What's this for?">
+                    </div>
+                </div>
+                
+                <!-- Payment Method Selection -->
+                <div style="margin-bottom: 30px;">
+                    <h3 style="margin-bottom: 20px;">Payment Method</h3>
+                    
+                    <div class="payment-methods-grid">
+                        <div class="payment-method-card" onclick="selectMethod('wallet', this)">
+                            <div class="payment-method-icon">
+                                <i class="fas fa-wallet"></i>
+                            </div>
+                            <h4 class="payment-method-name">Wallet</h4>
+                            <p class="payment-method-desc">Instant, 0% fee</p>
+                            <input type="radio" name="method_type" value="wallet" style="display: none;" required>
+                        </div>
+                        
+                        <div class="payment-method-card" onclick="selectMethod('card', this)">
+                            <div class="payment-method-icon">
+                                <i class="fas fa-credit-card"></i>
+                            </div>
+                            <h4 class="payment-method-name">Card</h4>
+                            <p class="payment-method-desc">Credit/Debit, 2% fee</p>
+                            <input type="radio" name="method_type" value="card" style="display: none;">
+                        </div>
+                        
+                        <div class="payment-method-card" onclick="selectMethod('upi', this)">
+                            <div class="payment-method-icon">
+                                <i class="fas fa-mobile-alt"></i>
+                            </div>
+                            <h4 class="payment-method-name">UPI</h4>
+                            <p class="payment-method-desc">Google Pay, PhonePe, 0.5% fee</p>
+                            <input type="radio" name="method_type" value="upi" style="display: none;">
+                        </div>
+                        
+                        <div class="payment-method-card" onclick="selectMethod('netbanking', this)">
+                            <div class="payment-method-icon">
+                                <i class="fas fa-university"></i>
+                            </div>
+                            <h4 class="payment-method-name">Net Banking</h4>
+                            <p class="payment-method-desc">All banks, 1% fee</p>
+                            <input type="radio" name="method_type" value="netbanking" style="display: none;">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Dynamic Form Fields (shown/hidden based on selection) -->
+                <div id="walletFields" style="display: none;" class="method-fields">
+                    <div class="form-group">
+                        <label><i class="fas fa-wallet"></i> Wallet ID</label>
+                        <input type="text" value="{{ user_wallet.wallet_id }}" disabled>
+                        <small>Using your Pexus Wallet</small>
+                    </div>
+                </div>
+                
+                <div id="cardFields" style="display: none;" class="method-fields">
+                    <div class="form-group">
+                        <label for="card_number">Card Number</label>
+                        <input type="text" id="card_number" name="card_number" placeholder="1234 5678 9012 3456" maxlength="19">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="card_holder">Card Holder Name</label>
+                        <input type="text" id="card_holder" name="card_holder" placeholder="John Doe">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="expiry">Expiry (MM/YY)</label>
+                            <input type="text" id="expiry" name="expiry" placeholder="MM/YY" maxlength="5">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="cvv">CVV</label>
+                            <input type="password" id="cvv" name="cvv" placeholder="123" maxlength="4">
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="upiFields" style="display: none;" class="method-fields">
+                    <div class="form-group">
+                        <label for="upi_id">UPI ID</label>
+                        <input type="text" id="upi_id" name="upi_id" placeholder="username@okhdfcbank">
+                    </div>
+                </div>
+                
+                <div id="netbankingFields" style="display: none;" class="method-fields">
+                    <div class="form-group">
+                        <label for="bank_name">Bank Name</label>
+                        <select id="bank_name" name="bank_name">
+                            <option value="">Select Bank</option>
+                            <option value="SBI">State Bank of India</option>
+                            <option value="HDFC">HDFC Bank</option>
+                            <option value="ICICI">ICICI Bank</option>
+                            <option value="Axis">Axis Bank</option>
+                            <option value="Kotak">Kotak Mahindra</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="account_number">Account Number</label>
+                        <input type="text" id="account_number" name="account_number" placeholder="Enter account number">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="ifsc">IFSC Code</label>
+                        <input type="text" id="ifsc" name="ifsc" placeholder="SBIN0001234" maxlength="11">
+                    </div>
+                </div>
+                
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-block btn-lg" style="margin-top: 30px;">
+                    <i class="fas fa-lock"></i> Pay Securely
+                </button>
+            </form>
+        </div>
+        
+        <!-- Security Notice -->
+        <div style="text-align: center; margin-top: 30px; padding: 20px; background: var(--light-blue); border-radius: var(--radius);">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 10px; color: var(--primary-deepblue);">
+                <i class="fas fa-shield-alt fa-2x"></i>
+                <div style="text-align: left;">
+                    <strong>🔒 256-bit SSL Encrypted</strong>
+                    <p style="margin: 0; font-size: 0.85rem; color: var(--text-light);">Your payment information is secure and never stored</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function selectMethod(method, element) {
+    // Hide all method fields
+    document.querySelectorAll('.method-fields').forEach(field => {
+        field.style.display = 'none';
+    });
+    
+    // Remove selected class from all cards
+    document.querySelectorAll('.payment-method-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    
+    // Add selected class to clicked card
+    element.classList.add('selected');
+    
+    // Check the radio button
+    const radio = element.querySelector('input[name="method_type"]');
+    if (radio) radio.checked = true;
+    
+    // Show corresponding fields
+    const fieldsDiv = document.getElementById(method + 'Fields');
+    if (fieldsDiv) {
+        fieldsDiv.style.display = 'block';
+    }
+}
+
+// Form validation
+document.getElementById('paymentForm').addEventListener('submit', function(e) {
+    const method = document.querySelector('input[name="method_type"]:checked');
+    if (!method) {
+        e.preventDefault();
+        alert('Please select a payment method');
+        return false;
+    }
+    
+    const amount = document.getElementById('amount').value;
+    if (!amount || amount <= 0) {
+        e.preventDefault();
+        alert('Please enter a valid amount');
+        return false;
+    }
+    
+    const receiver = document.getElementById('receiver_id').value;
+    if (!receiver) {
+        e.preventDefault();
+        alert('Please select a recipient');
+        return false;
+    }
+});
+
+// Card number formatting
+document.getElementById('card_number')?.addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\s/g, '');
+    value = value.replace(/\D/g, '');
+    
+    let formattedValue = '';
+    for (let i = 0; i < value.length; i++) {
+        if (i > 0 && i % 4 === 0) {
+            formattedValue += ' ';
+        }
+        formattedValue += value[i];
+    }
+    e.target.value = formattedValue;
+});
+
+// Expiry date formatting
+document.getElementById('expiry')?.addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length >= 2) {
+        value = value.substring(0, 2) + '/' + value.substring(2, 4);
+    }
+    e.target.value = value;
+});
+
+// IFSC code formatting
+document.getElementById('ifsc')?.addEventListener('input', function(e) {
+    e.target.value = e.target.value.toUpperCase();
+});
+</script>
+{% endblock %}

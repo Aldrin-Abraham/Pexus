@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Pexus Payment Gateway - {% block title %}Modern Digital Payments{% endblock %}</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%231a4b8c'/><text x='50' y='70' font-size='50' text-anchor='middle' fill='%23ffffff' font-weight='700'>P</text></svg>">
+    
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <!-- Flash Messages -->
+    <div class="flash-messages">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}">
+                        <span>{{ message }}</span>
+                        <button class="flash-close" onclick="this.parentElement.remove()">&times;</button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Header -->
+    <header>
+        <div class="container header-container">
+            <div class="logo-container">
+                <div class="logo-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <span class="logo-text">PexusPay</span>
+            </div>
+            
+            <nav class="nav-center">
+                <a href="{{ url_for('index') }}"><i class="fas fa-home"></i> Home</a>
+                {% if session.get('user_id') %}
+                    <a href="{{ url_for('dashboard') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                    <a href="{{ url_for('make_payment') }}"><i class="fas fa-paper-plane"></i> Pay</a>
+                    <a href="{{ url_for('transaction_history') }}"><i class="fas fa-history"></i> History</a>
+                    {% if session.get('user_type') == 'admin' %}
+                        <a href="{{ url_for('admin_dashboard') }}"><i class="fas fa-cog"></i> Admin</a>
+                    {% endif %}
+                {% endif %}
+            </nav>
+            
+            <div class="nav-right">
+                {% if session.get('user_id') %}
+                    <div class="user-menu">
+                        <div class="user-avatar">
+                            {{ session.get('user_name', 'U')[:1].upper() }}
+                        </div>
+                        <span class="user-name">{{ session.get('user_name', 'User') }}</span>
+                        <a href="{{ url_for('logout') }}" class="btn btn-sm btn-outline">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </div>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="btn btn-sm">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </a>
+                    <a href="{{ url_for('admin_login') }}" class="btn btn-sm btn-outline">
+                        <i class="fas fa-user-shield"></i> Admin
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer - White Background -->
+    <footer style="background: white; color: var(--text-dark); border-top: 1px solid var(--slate-light);">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4 style="color: var(--primary-deepblue);"><i class="fas fa-bolt"></i> PexusPay</h4>
+                    <p style="color: var(--text-light);">Next-generation digital payment gateway built with OOP principles. Secure, fast, and reliable.</p>
+                    <div style="margin-top: 20px;">
+                        <span class="oop-badge">Abstraction</span>
+                        <span class="oop-badge">Inheritance</span>
+                        <span class="oop-badge">Polymorphism</span>
+                        <span class="oop-badge">Encapsulation</span>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h4 style="color: var(--primary-deepblue);">Quick Links</h4>
+                    <ul>
+                        <li><a href="{{ url_for('index') }}" style="color: var(--text-light);"><i class="fas fa-chevron-right"></i> Home</a></li>
+                        <li><a href="{{ url_for('login') }}" style="color: var(--text-light);"><i class="fas fa-chevron-right"></i> Login</a></li>
+                        <li><a href="#" style="color: var(--text-light);"><i class="fas fa-chevron-right"></i> About Us</a></li>
+                        <li><a href="#" style="color: var(--text-light);"><i class="fas fa-chevron-right"></i> Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4 style="color: var(--primary-deepblue);">Payment Methods</h4>
+                    <ul>
+                        <li style="color: var(--text-light);"><i class="fas fa-wallet"></i> Wallet</li>
+                        <li style="color: var(--text-light);"><i class="fas fa-credit-card"></i> Credit/Debit Card</li>
+                        <li style="color: var(--text-light);"><i class="fas fa-mobile-alt"></i> UPI</li>
+                        <li style="color: var(--text-light);"><i class="fas fa-university"></i> Net Banking</li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4 style="color: var(--primary-deepblue);">Contact</h4>
+                    <ul>
+                        <li style="color: var(--text-light);"><i class="fas fa-envelope"></i> support@pexuspay.com</li>
+                        <li style="color: var(--text-light);"><i class="fas fa-phone"></i> +91 98765 43210</li>
+                        <li style="color: var(--text-light);"><i class="fas fa-map-marker-alt"></i> Bangalore, India</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom" style="border-top-color: var(--slate-light);">
+                <p style="color: var(--text-light);">&copy; 2026 Pexus Payment Gateway. All rights reserved. Built with OOP & Neon PostgreSQL.</p>
+                <p style="margin-top: 10px; font-size: 0.8rem; color: var(--text-muted);">
+                    <i class="fas fa-shield-alt"></i> PCI DSS Compliant | 
+                    <i class="fas fa-lock"></i> 256-bit SSL Encryption |
+                    <i class="fas fa-database"></i> Neon PostgreSQL
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // Auto-hide flash messages after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                const flashMessages = document.querySelectorAll('.flash-message');
+                flashMessages.forEach(function(message) {
+                    message.style.opacity = '0';
+                    setTimeout(function() {
+                        message.remove();
+                    }, 300);
+                });
+            }, 5000);
+        });
+
+        // Active nav link highlighting
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentLocation = window.location.pathname;
+            const navLinks = document.querySelectorAll('.nav-center a');
+            
+            navLinks.forEach(link => {
+                if (link.getAttribute('href') === currentLocation) {
+                    link.style.color = 'var(--accent-blue)';
+                    link.style.fontWeight = '600';
+                }
+            });
+        });
+    </script>
+    
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

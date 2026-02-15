@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Login - Pexus{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div style="max-width: 450px; margin: 0 auto;">
+        <div class="form-container" style="margin-top: 50px;">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <div style="font-size: 50px; color: var(--primary-deepblue); margin-bottom: 20px;">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <h2 style="margin-bottom: 10px;">Admin Access</h2>
+                <p style="color: var(--text-light);">Secure administrator login</p>
+            </div>
+            
+            <form method="POST">
+                <div class="form-group">
+                    <label for="username"><i class="fas fa-user"></i> Username</label>
+                    <input type="text" id="username" name="username" placeholder="Enter admin username" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password"><i class="fas fa-lock"></i> Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter admin password" required>
+                </div>
+                
+                <div style="background: #e3f2fd; border-left: 5px solid var(--accent-blue); padding: 15px; border-radius: var(--radius-sm); margin-bottom: 25px;">
+                    <p style="margin: 0; color: var(--primary-deepblue); font-size: 0.9rem;">
+                        <i class="fas fa-info-circle"></i> Demo credentials: <strong>admin / pexus@2024</strong>
+                    </p>
+                </div>
+                
+                <button type="submit" class="btn btn-block">
+                    <i class="fas fa-sign-in-alt"></i> Login as Admin
+                </button>
+            </form>
+            
+            <div style="text-align: center; margin-top: 25px;">
+                <a href="{{ url_for('login') }}" style="color: var(--accent-blue);">
+                    <i class="fas fa-arrow-left"></i> Back to User Login
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

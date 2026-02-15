@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+
+{% block title %}Transaction Summary - Pexus{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div style="margin-bottom: 40px;">
+        <h1 style="margin-bottom: 10px;"><i class="fas fa-chart-pie"></i> Payment Summary</h1>
+        <p style="color: var(--text-light);">Analytics and insights for your payment activity</p>
+    </div>
+    
+    <!-- Key Metrics -->
+    <div class="grid grid-4" style="margin-bottom: 40px;">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-exchange-alt"></i>
+            </div>
+            <div class="stat-number">{{ stats.total_transactions if stats.total_transactions else 0 }}</div>
+            <div class="stat-label">Total Transactions</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-number">{{ stats.successful_payments if stats.successful_payments else 0 }}</div>
+            <div class="stat-label">Successful</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-undo-alt"></i>
+            </div>
+            <div class="stat-number">{{ stats.refunded_payments if stats.refunded_payments else 0 }}</div>
+            <div class="stat-label">Refunded</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-indian-rupee-sign"></i>
+            </div>
+            <div class="stat-number">{{ format_currency(stats.total_volume) if stats.total_volume else '₹0.00' }}</div>
+            <div class="stat-label">Total Volume</div>
+        </div>
+    </div>
+    
+    <div class="grid grid-2" style="gap: 30px; margin-bottom: 40px;">
+        <!-- Payment Methods Breakdown -->
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title"><i class="fas fa-credit-card"></i> Payment Methods</h4>
+                <span class="status-badge">{{ stats.methods_breakdown|length if stats.methods_breakdown else 0 }} methods</span>
+            </div>
+            <div class="card-body">
+                {% if stats.methods_breakdown and stats.methods_breakdown.items() %}
+                    {% for method, count in stats.methods_breakdown.items() %}
+                    <div style="margin-bottom: 20px; padding: 15px; background: var(--slate-light); border-radius: var(--radius-sm);">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                {% if method == 'wallet' %}
+                                    <i class="fas fa-wallet" style="color: var(--accent-blue); font-size: 1.2rem;"></i>
+                                {% elif method == 'card' %}
+                                    <i class="fas fa-credit-card" style="color: var(--accent-blue); font-size: 1.2rem;"></i>
+                                {% elif method == 'upi' %}
+                                    <i class="fas fa-mobile-alt" style="color: var(--accent-blue); font-size: 1.2rem;"></i>
+                                {% elif method == 'netbanking' %}
+                                    <i class="fas fa-university" style="color: var(--accent-blue); font-size: 1.2rem;"></i>
+                                {% endif %}
+                                <span style="font-weight: 700; text-transform: capitalize; color: var(--primary-deepblue);">{{ method }}</span>
+                            </div>
+                            <span style="font-weight: 700; color: var(--primary-deepblue); background: white; padding: 5px 15px; border-radius: 20px; font-size: 0.9rem;">
+                                {{ count }} transactions
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div style="text-align: center; padding: 40px 20px;">
+                        <div style="font-size: 48px; color: var(--slate); margin-bottom: 15px;">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                        <p style="color: var(--text-light); margin-bottom: 10px;">No payment method data available</p>
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">Complete a transaction to see statistics</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Success Rate -->
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title"><i class="fas fa-chart-line"></i> Success Rate</h4>
+            </div>
+            <div class="card-body" style="text-align: center;">
+                <div style="font-size: 4rem; font-weight: 800; color: var(--success-green); margin-bottom: 5px; line-height: 1;">
+                    {% if stats.total_transactions and stats.total_transactions > 0 %}
+                        {{ (stats.successful_payments / stats.total_transactions * 100)|round|int }}%
+                    {% else %}
+                        0%
+                    {% endif %}
+                </div>
+                <p style="color: var(--text-light); margin-bottom: 30px; font-size: 1rem;">
+                    {{ stats.successful_payments if stats.successful_payments else 0 }} out of {{ stats.total_transactions if stats.total_transactions else 0 }} transactions successful
+                </p>
+                
+                <div style="display: flex; justify-content: center; gap: 40px; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--slate-light);">
+                    <div style="text-align: center;">
+                        <div style="font-size: 2rem; font-weight: 700; color: var(--primary-deepblue);">{{ stats.registered_methods if stats.registered_methods else 0 }}</div>
+                        <div style="color: var(--text-light); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">Payment Methods</div>
+                    </div>
+                    <div style="width: 1px; height: 40px; background: var(--slate);"></div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 2rem; font-weight: 700; color: var(--primary-deepblue);">{{ stats.active_users if stats.active_users else 0 }}</div>
+                        <div style="color: var(--text-light); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">Active Users</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Activity -->
+    <div style="margin-top: 30px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+            <h3 style="margin-bottom: 0;"><i class="fas fa-clock"></i> Recent Activity</h3>
+            <span class="status-badge" style="background: var(--light-blue); color: var(--primary-deepblue);">
+                <i class="fas fa-sync-alt"></i> Live Updates
+            </span>
+        </div>
+        
+        <div class="data-table-container">
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Transaction ID</th>
+                            <th>Time</th>
+                            <th>Sender</th>
+                            <th>Receiver</th>
+                            <th>Amount</th>
+                            <th>Method</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if stats.recent_activity %}
+                            {% for t in stats.recent_activity %}
+                            <tr>
+                                <td>
+                                    <span style="font-family: var(--font-mono); font-size: 0.85rem; background: var(--slate-light); padding: 4px 8px; border-radius: 6px;">
+                                        {{ t.transaction_id[:8] if t.transaction_id else 'N/A' }}...
+                                    </span>
+                                </td>
+                                <td>
+                                    <span style="font-size: 0.85rem; font-weight: 500;">
+                                        {{ t.timestamp.strftime('%H:%M:%S') if t.timestamp else 'N/A' }}
+                                    </span><br>
+                                    <span style="font-size: 0.7rem; color: var(--text-light);">
+                                        {{ t.timestamp.strftime('%d/%m/%y') if t.timestamp else '' }}
+                                    </span>
+                                </td>
+                                <td>{{ t.sender_id }}</td>
+                                <td>{{ t.receiver_id }}</td>
+                                <td class="amount" style="font-weight: 700;">{{ format_currency(t.amount) if t.amount else 'N/A' }}</td>
+                                <td>
+                                    <span style="text-transform: uppercase; font-size: 0.7rem; padding: 4px 10px; background: var(--slate-light); border-radius: 20px; font-weight: 600;">
+                                        {{ t.method_type }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if t.status == 'success' and not t.refunded %}
+                                        <span class="status-badge status-success">Success</span>
+                                    {% elif t.refunded %}
+                                        <span class="status-badge status-refunded">Refunded</span>
+                                    {% elif t.status == 'pending' %}
+                                        <span class="status-badge status-pending">Pending</span>
+                                    {% elif t.status == 'failed' %}
+                                        <span class="status-badge status-failed">Failed</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="7" style="text-align: center; padding: 70px 20px;">
+                                    <div style="font-size: 70px; color: var(--slate); margin-bottom: 20px;">
+                                        <i class="fas fa-exchange-alt"></i>
+                                    </div>
+                                    <h3 style="margin-bottom: 10px;">No Recent Transactions</h3>
+                                    <p style="color: var(--text-light); margin-bottom: 25px;">Your transaction activity will appear here</p>
+                                    <a href="{{ url_for('make_payment') }}" class="btn">
+                                        <i class="fas fa-paper-plane"></i> Make a Payment
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

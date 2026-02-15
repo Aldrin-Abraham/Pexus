@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block title %}Transaction History - {{ user_id }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+        <div>
+            <h1 style="margin-bottom: 10px;"><i class="fas fa-history"></i> Transaction History</h1>
+            <p style="color: var(--text-light);">View all your payment activity</p>
+        </div>
+        
+        <div>
+            <a href="{{ url_for('make_payment') }}" class="btn">
+                <i class="fas fa-plus-circle"></i> New Payment
+            </a>
+        </div>
+    </div>
+    
+    {% if transactions and transactions|length > 0 %}
+        <!-- Summary Cards -->
+        {% set successful_count = transactions|selectattr('status', 'equalto', 'success')|list|length %}
+        
+        <!-- Calculate total spent correctly -->
+        {% set total_spent = namespace(value=0) %}
+        {% for t in transactions %}
+            {% if t.status == 'success' and t.sender_id == user_id %}
+                {% set total_spent.value = total_spent.value + t.amount %}
+            {% endif %}
+        {% endfor %}
+        
+        <div class="grid grid-3" style="margin-bottom: 30px;">
+            <div class="stat-card" style="padding: 20px;">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div style="font-size: 30px; color: var(--accent-blue);">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                    <div>
+                        <div style="font-size: 1.8rem; font-weight: 700; color: var(--primary-deepblue);">
+                            {{ transactions|length }}
+                        </div>
+                        <div style="color: var(--text-light);">Total Transactions</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-card" style="padding: 20px;">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div style="font-size: 30px; color: var(--success-green);">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div>
+                        <div style="font-size: 1.8rem; font-weight: 700; color: var(--primary-deepblue);">
+                            {{ successful_count }}
+                        </div>
+                        <div style="color: var(--text-light);">Successful</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-card" style="padding: 20px;">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div style="font-size: 30px; color: var(--gold);">
+                        <i class="fas fa-indian-rupee-sign"></i>
+                    </div>
+                    <div>
+                        <div style="font-size: 1.8rem; font-weight: 700; color: var(--primary-deepblue);">
+                            {{ format_currency(total_spent.value) if total_spent.value > 0 else '₹0.00' }}
+                        </div>
+                        <div style="color: var(--text-light);">Total Spent</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Transactions Table -->
+        <div class="data-table-container">
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Transaction ID</th>
+                            <th>Date & Time</th>
+                            <th>Type</th>
+                            <th>Recipient/Sender</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                            <th>Method</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for t in transactions %}
+                        {% if t %}
+                        <tr>
+                            <td>
+                                <span style="font-family: monospace; font-size: 0.85rem;">
+                                    {{ t.transaction_id[:8] if t.transaction_id else 'N/A' }}...
+                                </span>
+                            </td>
+                            <td>
+                                <span style="font-size: 0.85rem;">
+                                    {{ t.timestamp.strftime('%d/%m/%Y') if t.timestamp else 'N/A' }}
+                                </span><br>
+                                <span style="font-size: 0.75rem; color: var(--text-light);">
+                                    {{ t.timestamp.strftime('%I:%M %p') if t.timestamp else '' }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if t.sender_id == user_id %}
+                                    <span style="color: var(--danger-red);">
+                                        <i class="fas fa-arrow-up"></i> Sent
+                                    </span>
+                                {% else %}
+                                    <span style="color: var(--success-green);">
+                                        <i class="fas fa-arrow-down"></i> Received
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if t.sender_id == user_id %}
+                                    {{ t.receiver_id if t.receiver_id else 'N/A' }}
+                                {% else %}
+                                    {{ t.sender_id if t.sender_id else 'N/A' }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span style="font-size: 0.85rem;">
+                                    {{ t.description[:30] + '...' if t.description and t.description|length > 30 else t.description or '-' }}
+                                </span>
+                            </td>
+                            <td class="amount">
+                                {% if t.sender_id == user_id %}
+                                    <span style="color: var(--danger-red);">- {{ format_currency(t.amount) if t.amount else '₹0.00' }}</span>
+                                {% else %}
+                                    <span style="color: var(--success-green);">+ {{ format_currency(t.amount) if t.amount else '₹0.00' }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span style="font-size: 0.75rem; padding: 4px 8px; background: var(--slate-light); border-radius: 12px;">
+                                    {{ t.method_type|upper if t.method_type else 'N/A' }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if t.status == 'success' and not t.refunded %}
+                                    <span class="status-badge status-success">Success</span>
+                                {% elif t.refunded %}
+                                    <span class="status-badge status-refunded">Refunded</span>
+                                {% elif t.status == 'pending' %}
+                                    <span class="status-badge status-pending">Pending</span>
+                                {% elif t.status == 'failed' %}
+                                    <span class="status-badge status-failed">Failed</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        <!-- Empty State -->
+        <div style="text-align: center; padding: 80px 20px; background: white; border-radius: var(--radius); box-shadow: var(--shadow);">
+            <div style="font-size: 80px; color: var(--slate); margin-bottom: 20px;">
+                <i class="fas fa-receipt"></i>
+            </div>
+            <h2 style="margin-bottom: 15px;">No Transactions Yet</h2>
+            <p style="color: var(--text-light); margin-bottom: 30px; max-width: 400px; margin-left: auto; margin-right: auto;">
+                Your payment history will appear here once you start making transactions.
+            </p>
+            <a href="{{ url_for('make_payment') }}" class="btn btn-lg">
+                <i class="fas fa-paper-plane"></i> Make Your First Payment
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
